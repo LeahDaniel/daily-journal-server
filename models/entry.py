@@ -11,3 +11,5 @@ class Entry():
         self.date = date
         self.concept = concept
         self.entry = entry
+        self.mood = None
+        self.tags = None
