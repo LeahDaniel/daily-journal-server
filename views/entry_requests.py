@@ -97,7 +97,25 @@ def get_single_entry(id):
                       row['date'], row['concept'], row['entry'])
 
         mood = Mood(row['mood_id'], row['label'])
+        
+        db_cursor.execute("""
+            SELECT
+                et.tag_id
+            FROM EntryTag et
+            JOIN Entry e
+                ON et.entry_id = e.id
+            WHERE et.entry_id = ?
+            """, (row['id'], ))
 
+        # Convert rows of data into a Python list
+        tag_data = db_cursor.fetchall()
+
+        tag_list = []
+
+        for new_row in tag_data:
+            tag_list.append(new_row['tag_id'])
+
+        entry.tags = tag_list
         entry.mood = mood.__dict__
 
         return json.dumps(entry.__dict__)

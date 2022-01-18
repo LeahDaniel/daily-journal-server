@@ -1,6 +1,7 @@
 import json
 from http.server import BaseHTTPRequestHandler, HTTPServer
-from views import (get_all_entries, get_single_entry, delete_entry, get_entries_by_search, create_entry, update_entry)
+from views import (get_all_entries, get_single_entry, delete_entry, get_entries_by_search,
+                   create_entry, update_entry, get_all_moods, get_all_tags)
 
 # Here's a class. It inherits from another class.
 # For now, think of a class as a container for functions that
@@ -89,24 +90,19 @@ class HandleRequests(BaseHTTPRequestHandler):
 
             if resource == "entries":
                 if id is not None:
-                    response = f"{get_single_entry(id)}"
+                    response = get_single_entry(id)
                 else:
-                    response = f"{get_all_entries()}"
-            # elif resource == "customers":
-            #     if id is not None:
-            #         response = f"{get_single_customer(id)}"
-            #     else:
-            #         response = f"{get_all_customers()}"
-            # elif resource == "locations":
-            #     if id is not None:
-            #         response = f"{get_single_location(id)}"
-            #     else:
-            #         response = f"{get_all_locations()}"
-            # elif resource == "employees":
-            #     if id is not None:
-            #         response = f"{get_single_employee(id)}"
-            #     else:
-            #         response = f"{get_all_employees()}"
+                    response = get_all_entries()
+            elif resource == "moods":
+                if id is not None:
+                    response = get_single_mood(id)
+                else:
+                    response = get_all_moods()
+            elif resource == "tags":
+                if id is not None:
+                    response = get_single_tag(id)
+                else:
+                    response = get_all_tags()
 
         # Response from parse_url() is a tuple with 3
         # items in it, which means the request was for
@@ -114,17 +110,8 @@ class HandleRequests(BaseHTTPRequestHandler):
         elif len(parsed) == 3:
             (resource, key, value) = parsed
 
-            # Is the resource `customers` and was there a
-            # query parameter that specified the customer
-            # email as a filtering value?
             if key == "q" and resource == "entries":
-                response = f"{get_entries_by_search(value)}"
-            # elif key == "location_id" and resource == "animals":
-            #     response = get_animals_by_location(int(value))
-            # elif key == "location_id" and resource == "employees":
-            #     response = get_employees_by_location(int(value))
-            # elif key == "status" and resource == "animals":
-            #     response = get_animals_by_status(value)
+                response = get_entries_by_search(value)
 
         self.wfile.write(response.encode())
 
@@ -146,30 +133,13 @@ class HandleRequests(BaseHTTPRequestHandler):
 
         # Initialize new entry
         new_entry = None
-        # # Initialize new location
-        # new_location = None
-        # # Initialize new employee
-        # new_employee = None
-        # # Initialize new customer
-        # new_customer = None
 
         # Add a new dictionary to the list.
         if resource == "entries":
             new_entry = create_entry(post_body)
             # Encode the new entry and send in response
             self.wfile.write(f"{new_entry}".encode())
-        # if resource == "locations":
-        #     new_location = create_location(post_body)
-        #     # Encode the new location and send in response
-        #     self.wfile.write(f"{new_location}".encode())
-        # if resource == "customers":
-        #     new_customer = create_customer(post_body)
-        #     # Encode the new customer and send in response
-        #     self.wfile.write(f"{new_customer}".encode())
-        # if resource == "employees":
-        #     new_employee = create_employee(post_body)
-        #     # Encode the new employee and send in response
-        #     self.wfile.write(f"{new_employee}".encode())
+
 
     # Here's a method on the class that overrides the parent's method.
     # It handles any PUT request.
@@ -190,15 +160,6 @@ class HandleRequests(BaseHTTPRequestHandler):
         # Update a single entry in the list
         if resource == "entries":
             success = update_entry(id, post_body)
-        # Update a single location in the list
-        elif resource == "locations":
-            success = update_location(id, post_body)
-        # Update a single employee in the list
-        elif resource == "employees":
-            success = update_employee(id, post_body)
-        # Update a single customer in the list
-        elif resource == "customers":
-            success = update_customer(id, post_body)
 
         if success:
             self._set_headers(204)
@@ -219,15 +180,6 @@ class HandleRequests(BaseHTTPRequestHandler):
         # Delete a single entry from the list
         if resource == "entries":
             delete_entry(id)
-        # Delete a single location from the list
-        if resource == "locations":
-            delete_location(id)
-        # Delete a single employee from the list
-        if resource == "employees":
-            delete_employee(id)
-        # Delete a single customer from the list
-        if resource == "customers":
-            delete_customer(id)
 
         # Encode the new dictionary and send in response
         self.wfile.write("".encode())
